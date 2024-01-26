@@ -45,7 +45,7 @@ class Extract:
         :return:dataframe with cheese information and create date
         """
         data = pd.DataFrame(cheese_list)
-        data['creation_date'] = datetime.now()
+        data['creation_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         data['Famille'].replace({
             'Vache Bufflonne': 'Vache ou Bufflonne',
             'Vache ou Bufflonne': 'Vache ou Bufflonne',
