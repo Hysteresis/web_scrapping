@@ -6,6 +6,8 @@ Scrapper le classement des fromages par ordre alphabétique :
 ## Base de données 
 Utilisation de SQLite comme base de données
 
+## Utilisation
+
 
 
 ## Créer une interface utilisateur qui aura les fonctionnalités suivantes :
