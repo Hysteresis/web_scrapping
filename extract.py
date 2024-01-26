@@ -31,7 +31,7 @@ class Extract:
 
         for i in range(3, len(tds_list), 3):
             cheese = tds_list[i].text.strip()
-            if cheese and not tds_list[i].find('h2'):  # Check if h2 tag is not present
+            if cheese and not tds_list[i].find('h2'):
                 family = tds_list[i + 1].text.strip()
                 paste = tds_list[i + 2].text.strip()
                 cheese_list.append({'Fromage': cheese, 'Famille': family, 'Pate': paste})
@@ -70,6 +70,14 @@ class Extract:
         con = sqlite3.connect(db_path)
 
         data = pd.read_sql_query("SELECT * FROM ODS", con)
+        data['Famille'].replace({
+            'Vache Bufflonne': 'Vache ou Bufflonne',
+            'Vache ou Bufflonne': 'Vache ou Bufflonne',
+            'Vache Brebis': 'Vache ou Brebis',
+            'Vache/Brebis': 'Vache ou Brebis',
+            'Vache / Chèvre': 'Vache ou Chèvre',
+            'Chèvre Brebis': 'Chèvre ou Brebis'
+        }, inplace=True)
         count_by_family = data['Fromage'].groupby(data['Famille']).count()
         con.close()
         print(count_by_family)

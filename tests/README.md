@@ -1,3 +1,13 @@
+# Web scrapping
+## Description
+Scrapper le classement des fromages par ordre alphabétique :
+[la boite du fromager](https://www.laboitedufromager.com/liste-des-fromages-par-ordre-alphabetique)
+
+## Base de données 
+Utilisation de SQLite comme base de données
+
+
+
 ## Créer une interface utilisateur qui aura les fonctionnalités suivantes :
 
 - Un bouton pour mettre à jour la BDD
