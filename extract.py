@@ -46,6 +46,14 @@ class Extract:
         """
         data = pd.DataFrame(cheese_list)
         data['creation_date'] = datetime.now()
+        data['Famille'].replace({
+            'Vache Bufflonne': 'Vache ou Bufflonne',
+            'Vache ou Bufflonne': 'Vache ou Bufflonne',
+            'Vache Brebis': 'Vache ou Brebis',
+            'Vache/Brebis': 'Vache ou Brebis',
+            'Vache / Chèvre': 'Vache ou Chèvre',
+            'Chèvre Brebis': 'Chèvre ou Brebis',
+        }, inplace=True)
         return data
 
     def store_data_in_database(self, data):
@@ -70,14 +78,6 @@ class Extract:
         con = sqlite3.connect(db_path)
 
         data = pd.read_sql_query("SELECT * FROM ODS", con)
-        data['Famille'].replace({
-            'Vache Bufflonne': 'Vache ou Bufflonne',
-            'Vache ou Bufflonne': 'Vache ou Bufflonne',
-            'Vache Brebis': 'Vache ou Brebis',
-            'Vache/Brebis': 'Vache ou Brebis',
-            'Vache / Chèvre': 'Vache ou Chèvre',
-            'Chèvre Brebis': 'Chèvre ou Brebis'
-        }, inplace=True)
         count_by_family = data['Fromage'].groupby(data['Famille']).count()
         con.close()
         print(count_by_family)

@@ -20,4 +20,4 @@ extractor = Extract(url)
 extractor.read_website()
 extractor.count_family()
 
-tk.mainloop()
+# tk.mainloop()
