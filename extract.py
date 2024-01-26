@@ -70,7 +70,6 @@ class Extract:
         con = sqlite3.connect(db_path)
 
         data = pd.read_sql_query("SELECT * FROM ODS", con)
-        # print(data['Famille'])
         count_by_family = data['Fromage'].groupby(data['Famille']).count()
         con.close()
-        # print(count_by_family)
+        print(count_by_family)
