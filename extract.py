@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime
 import sqlite3
 import os
+import matplotlib.pyplot as plt
 
 
 class Extract:
@@ -35,7 +36,7 @@ class Extract:
                 family = tds_list[i + 1].text.strip()
                 paste = tds_list[i + 2].text.strip()
                 cheese_list.append({'Fromage': cheese, 'Famille': family, 'Pate': paste})
-        print(cheese_list)
+        # print(cheese_list)
         return cheese_list
 
     def create_dataframe(self, cheese_list):
@@ -80,4 +81,37 @@ class Extract:
         data = pd.read_sql_query("SELECT * FROM ODS", con)
         count_by_family = data['Fromage'].groupby(data['Famille']).count()
         con.close()
-        print(count_by_family)
+        return count_by_family
+
+    def draw_pie_chart(self):
+        """
+        Dessiner un diagramme circulaire (pie chart) pour la famille des fromages
+        :return: None
+        """
+        labels = []
+        sizes = []
+
+        count_by_family = self.count_family()
+
+        other = 0
+        for family, number in count_by_family.items():
+            if number < 5:
+                other += number
+            else:
+                labels.append(family)
+                sizes.append(number)
+        if other > 0:
+            labels.append("Autres")
+            sizes.append(other)
+
+        figure, axis = plt.subplots()
+
+        axis.pie(sizes, labels=labels, autopct="%1.1f%%", shadow=True, startangle=90)
+        axis.axis('equal')
+
+        axis.set_title("Famille")
+
+        plt.show()
+
+
+

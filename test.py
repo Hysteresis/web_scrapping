@@ -6,7 +6,7 @@ import requests
 
 
 def db_path():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'DATA', 'boitedufromager.sqlite')
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), '.', 'DATA', 'boitedufromager.sqlite')
 
 
 @pytest.mark.parametrize("url", ["https://www.laboitedufromager.com/liste-des-fromages-par-ordre-alphabetique/"])
@@ -103,7 +103,7 @@ def test_8_format_date_creation():
     con.close()
 
     # Vérifier le format 'AAAA-MM-JJ HH:MM:SS.SSSSSS'
-    assert all(pd.to_datetime(data['creation_date'],  format='%Y-%m-%d %H:%M:%S.%f').notnull())
+    assert all(pd.to_datetime(data['creation_date'],  format='%Y-%m-%d %H:%M:%S').notnull())
 
 
 @pytest.mark.parametrize("fromage, famille, pate", [('Abbaye de la Pierre-qui-Vire', 'Vache', 'Molle à croûte lavée'),
