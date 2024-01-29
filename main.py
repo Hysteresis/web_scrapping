@@ -1,13 +1,12 @@
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from extract import Extract
 import tkinter as tk
-# import matplotlib.pyplot as plt
 import subprocess
 import pandas as pd
 
 result = subprocess.run(["pytest", "tests/test.py"], capture_output=True, text=True)
 test_result = ""
-print(result.stdout)
+# print(result.stdout)
 
 
 for index, elt in enumerate(result.stdout):
@@ -26,7 +25,6 @@ extractor = Extract(url)
 
 def update_db():
     extractor.read_website()
-    print(extractor.count_family())
     return extractor.count_family()
 
 
@@ -37,12 +35,16 @@ def show_pie_chart():
         """
     extractor.draw_pie_chart()
 
+
 def percentage_test():
     file_path = 'report.xlsx'
     df = pd.read_excel(file_path)
+    total_rows = len(df)
     passed_count = df['result'].value_counts().get('PASSED', 0)
-    print(f"Nombre de lignes où 'PASSED' est présent : {passed_count}")
-    result_label.config(text=f"Pourcentage de test réussis : {passed_count}")
+    success_percentage = (passed_count / total_rows) * 100
+
+    result_label.config(text=f"Pourcentage de tests réussis : {success_percentage:.2f}%")
+
 
 
 

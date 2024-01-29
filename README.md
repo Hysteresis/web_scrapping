@@ -17,3 +17,15 @@ Utilisation de SQLite comme base de données
 - Un diagramme en camembert qui affichera le ratio de fromage par famille
 
 - Un taux de fiabilité des résultats
+
+## Récupérer de nouvelle informations :
+
+- L’image du fromage
+
+- Le prix du fromage
+
+- La description
+
+- La moyenne des notes
+
+- Le nombre d’avis

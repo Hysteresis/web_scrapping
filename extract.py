@@ -5,6 +5,7 @@ from datetime import datetime
 import sqlite3
 import os
 import matplotlib.pyplot as plt
+from slugify import slugify
 
 
 class Extract:
@@ -35,9 +36,36 @@ class Extract:
             if cheese and not tds_list[i].find('h2'):
                 family = tds_list[i + 1].text.strip()
                 paste = tds_list[i + 2].text.strip()
-                cheese_list.append({'Fromage': cheese, 'Famille': family, 'Pate': paste})
-        # print(cheese_list)
+                link_tag = tds_list[i].find('a')
+                if link_tag:
+                    url_cheese = link_tag['href']
+                    # img_url = self.get_url_images(url_cheese)
+                    print(url_cheese)
+                    cheese_list.append({'Fromage': cheese, 'url_cheese': url_cheese, 'Famille': family, 'Pate': paste,
+                                        })
+                else:
+                    url_cheese = None
+                cheese_list.append({'Fromage': cheese, 'url_cheese': url_cheese, 'Famille': family, 'Pate': paste,
+                                   })
+
         return cheese_list
+
+    def get_url_images(self, url_cheese):
+        full_url = "https://www.laboitedufromager.com/" + url_cheese
+        # data = urlopen(full_url)
+        # soup = BeautifulSoup(data, features="html.parser")
+        # img_tags = soup.findAll('img', {'data-large_image': True})
+        #
+        # if img_tags:
+        #     first_img_tag = img_tags[0]
+        #     img_url = first_img_tag['data-large_image']
+        #     # print(img_url)
+        #     return img_url
+        # else:
+        #     print("pas d'url")
+        #     return None
+
+
 
     def create_dataframe(self, cheese_list):
         """
@@ -54,7 +82,7 @@ class Extract:
             'Vache/Brebis': 'Vache ou Brebis',
             'Vache / Chèvre': 'Vache ou Chèvre',
             'Chèvre Brebis': 'Chèvre ou Brebis',
-        }, inplace=True)
+        })
         return data
 
     def store_data_in_database(self, data):
@@ -69,6 +97,7 @@ class Extract:
         con = sqlite3.connect(db_path)
         data.to_sql("ODS", con, if_exists="replace", index=False)
         con.close()
+
 
     def count_family(self):
         """
@@ -112,6 +141,5 @@ class Extract:
         axis.set_title("Famille")
 
         plt.show()
-
 
 
