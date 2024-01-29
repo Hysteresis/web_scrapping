@@ -37,33 +37,29 @@ class Extract:
                 family = tds_list[i + 1].text.strip()
                 paste = tds_list[i + 2].text.strip()
                 link_tag = tds_list[i].find('a')
-                if link_tag:
-                    url_cheese = link_tag['href']
-                    # img_url = self.get_url_images(url_cheese)
-                    print(url_cheese)
-                    cheese_list.append({'Fromage': cheese, 'url_cheese': url_cheese, 'Famille': family, 'Pate': paste,
-                                        })
-                else:
-                    url_cheese = None
-                cheese_list.append({'Fromage': cheese, 'url_cheese': url_cheese, 'Famille': family, 'Pate': paste,
-                                   })
+                url_cheese = link_tag['href'] if link_tag else None
+                img_url = self.get_url_images(url_cheese) if url_cheese else None
+
+                cheese_info = {'Fromage': cheese, 'url_cheese': url_cheese, 'Famille': family, 'Pate': paste,
+                               'url_image': img_url}
+                cheese_list.append(cheese_info)
 
         return cheese_list
 
     def get_url_images(self, url_cheese):
         full_url = "https://www.laboitedufromager.com/" + url_cheese
-        # data = urlopen(full_url)
-        # soup = BeautifulSoup(data, features="html.parser")
-        # img_tags = soup.findAll('img', {'data-large_image': True})
-        #
-        # if img_tags:
-        #     first_img_tag = img_tags[0]
-        #     img_url = first_img_tag['data-large_image']
-        #     # print(img_url)
-        #     return img_url
-        # else:
-        #     print("pas d'url")
-        #     return None
+        data = urlopen(full_url)
+        soup = BeautifulSoup(data, features="html.parser")
+        img_tags = soup.findAll('img', {'data-large_image': True})
+
+        if img_tags:
+            first_img_tag = img_tags[0]
+            img_url = first_img_tag['data-large_image']
+            print(img_url)
+            return img_url
+        else:
+            print("pas d'url")
+            return None
 
 
 
