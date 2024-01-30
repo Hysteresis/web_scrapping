@@ -16,9 +16,12 @@ class Extract:
         Extract data from website and store data in DB
         :return: None
         """
-        tds_list = self.extract_data_from_website()
-        data = self.create_dataframe(tds_list)
-        self.store_data_in_database(data)
+        cheese_list = self.extract_data_from_website()
+        data = self.create_dataframe(cheese_list)
+        print(data.columns)
+        number_of_lines = data['url_cheese'].count()
+        print(number_of_lines)
+        # self.store_data_in_database(data)
 
     def extract_data_from_website(self):
         """
@@ -37,68 +40,66 @@ class Extract:
                 paste = tds_list[i + 2].text.strip()
                 link_tag = tds_list[i].find('a')
                 url_cheese = link_tag['href'] if link_tag else None
-                img_url = self.get_url_images(url_cheese) if url_cheese else None
-                price = self.get_cheese_price(url_cheese)
-                description = self.get_description(url_cheese)
+                if url_cheese:
+                    details = list(self.get_cheese_details(url_cheese))
+                    details[2] = details[2].replace('\xa0', '')
+                    details = tuple(details)
 
-                cheese_info = {'Fromage': cheese, 'Famille': family, 'Pate': paste, 'Prix_TTC': price,
-                               'Description': description, 'Url_fromage': url_cheese, 'Url_image': img_url}
-                cheese_list.append(cheese_info)
+                    cheese_info = {'Fromage': cheese,
+                                   'Famille': family,
+                                   'Pate': paste,
+                                   'Prix_TTC': details[1],
+                                   'Description': details[2],
+                                   'Moyenne': details[4],
+                                   'Nombre_avis': details[3],
+                                   'Url_fromage': url_cheese,
+                                   'Url_image': details[0]
+                                   }
 
+                    cheese_list.append(cheese_info)
+                    print(cheese_list)
         return cheese_list
 
-    def get_description(self, url_cheese):
-        """
-        get the description of a cheese
-        :return : price of cheese TTC
-        """
-        # <meta property="og:description" content="L’Abondance est un fromage au lait cru de vache de race Abondance, Tarine et Montbéliarde. À pâte demi-cuite, il se présente sous la forme d’une meule de 6 à 12 kg, à talon concave. Il a une pâte souple et fondante de couleur ivoire à jaune pâle, avec un taux de matière grasse de 33 %.
-    # La durée d’affinage est d’au moins 3 mois sur des planches d’épicéa et en cave fraîche et humide au cours desquels il est régulièrement frotté à l’eau salée et retourné. L’Abondance est produite uniquement dans la Haute-Savoie. Il est apprécié tel quel, fondu ou cuisiné dans de nombreux plats salés pour ses notes de noisette et sa saveur fruitée.
-    # Lorsque l’Abondance est fermier, il comporte une plaque de caséine ovale et verte sur son talon. S’il est fabriqué en fromagerie (laitier), la plaque est carrée et rouge.
-    # Prix au kilo : 39,50€ (soit 11,85€ pour 300g)">
-        if url_cheese != None:
+    def get_cheese_details(self,url_cheese):
+        # < div
+        #
+        # class ="woocommerce-product-rating" >
+        #
+        # < div
+        #
+        # class ="star-rating" role="img" aria-label="Note 4.21 sur 5" > < span style="width:84.2%" > Noté < strong class ="rating" > 4.21 < / strong > sur 5 basé sur < span class ="rating" > 29 < / span > notations client < / span > < / div > < a href="#reviews" class ="woocommerce-review-link" rel="nofollow" > ( < span
+        #
+        # class ="count" > 29 < / span > avis client) < / a >
+        # < / div >
+        if url_cheese is not None:
             full_url = "https://www.laboitedufromager.com/" + url_cheese
             data = urlopen(full_url)
             soup = BeautifulSoup(data, features="html.parser")
-            description = soup.find('meta', {'property': 'og:description'})
-            print(description)
-            description = description.get('content')
-            print(description)
 
-            return description
+            img_tags = soup.findAll('img', {'data-large_image': True})
+            if img_tags:
+                first_img_tag = img_tags[0]
+                img_url = first_img_tag['data-large_image']
 
-    def get_cheese_price(self, url_cheese):
-        """
-        get the price of a cheese
-        :return : price of cheese TTC
-
-        """
-        if url_cheese != None:
-            full_url = "https://www.laboitedufromager.com/" + url_cheese
-            data = urlopen(full_url)
-            soup = BeautifulSoup(data, features="html.parser")
             prices = soup.find('p', {'class': "price"})
-            cheese_price = prices.get_text(strip=True)
-            cheese_price = cheese_price.replace('€', '')
-            cheese_price = cheese_price.replace('TTC', '')
+            if prices:
+                cheese_price = prices.get_text(strip=True)
+                cheese_price = cheese_price.replace('€', '')
+                cheese_price = cheese_price.replace('TTC', '')
 
-            return cheese_price
+            description = soup.find('meta', {'property': 'og:description'})
+            if description:
+                description = description.get('content')
 
-    def get_url_images(self, url_cheese):
-        """
-        get url of images
-        :return : url of image (string)
-        """
-        full_url = "https://www.laboitedufromager.com/" + url_cheese
-        data = urlopen(full_url)
-        soup = BeautifulSoup(data, features="html.parser")
-        img_tags = soup.findAll('img', {'data-large_image': True})
+            count_star_rating = soup.find('span', {'class': 'rating'})
+            if count_star_rating:
+                count_star_rating = count_star_rating.getText()
 
-        if img_tags:
-            first_img_tag = img_tags[0]
-            img_url = first_img_tag['data-large_image']
+            average_star_rating = soup.find('strong', {'class': 'rating'})
+            if average_star_rating:
+                average_star_rating = average_star_rating.getText()
 
-            return img_url
+        return img_url, cheese_price, description, count_star_rating, average_star_rating
 
 
     def create_dataframe(self, cheese_list):
