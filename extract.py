@@ -18,10 +18,10 @@ class Extract:
         """
         cheese_list = self.extract_data_from_website()
         data = self.create_dataframe(cheese_list)
-        print(data.columns)
-        number_of_lines = data['url_cheese'].count()
-        print(number_of_lines)
-        # self.store_data_in_database(data)
+        # print(data.columns)
+        # number_of_lines = data['url_cheese'].count()
+        # print(number_of_lines)
+        self.store_data_in_database(data)
 
     def extract_data_from_website(self):
         """
@@ -57,20 +57,15 @@ class Extract:
                                    }
 
                     cheese_list.append(cheese_info)
-                    print(cheese_list)
+                    print(cheese)
         return cheese_list
 
     def get_cheese_details(self,url_cheese):
-        # < div
-        #
-        # class ="woocommerce-product-rating" >
-        #
-        # < div
-        #
-        # class ="star-rating" role="img" aria-label="Note 4.21 sur 5" > < span style="width:84.2%" > Noté < strong class ="rating" > 4.21 < / strong > sur 5 basé sur < span class ="rating" > 29 < / span > notations client < / span > < / div > < a href="#reviews" class ="woocommerce-review-link" rel="nofollow" > ( < span
-        #
-        # class ="count" > 29 < / span > avis client) < / a >
-        # < / div >
+        img_url = None
+        cheese_price = None
+        description = None
+        count_star_rating = None
+        average_star_rating = None
         if url_cheese is not None:
             full_url = "https://www.laboitedufromager.com/" + url_cheese
             data = urlopen(full_url)
@@ -94,10 +89,9 @@ class Extract:
             count_star_rating = soup.find('span', {'class': 'rating'})
             if count_star_rating:
                 count_star_rating = count_star_rating.getText()
-
-            average_star_rating = soup.find('strong', {'class': 'rating'})
-            if average_star_rating:
-                average_star_rating = average_star_rating.getText()
+                average_star_rating = soup.find('strong', {'class': 'rating'})
+                if average_star_rating:
+                    average_star_rating = average_star_rating.getText()
 
         return img_url, cheese_price, description, count_star_rating, average_star_rating
 
@@ -176,3 +170,4 @@ class Extract:
         axis.axis('equal')
 
         plt.show()
+

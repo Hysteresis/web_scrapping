@@ -1,3 +1,5 @@
+import timeit
+
 from extract import Extract
 import tkinter as tk
 import subprocess
@@ -7,7 +9,6 @@ import os
 
 result = subprocess.run(["pytest", "tests/test.py"], capture_output=True, text=True)
 test_result = ""
-# print(result.stdout)
 
 
 for index, elt in enumerate(result.stdout):
@@ -29,8 +30,14 @@ def update_db():
     store data in DB
     :return : count by family the number of cheese
     """
+    start_time = timeit.default_timer()
     extractor.read_website()
-
+    end_time = timeit.default_timer()
+    elapsed_time = end_time - start_time
+    elapsed_time = round(elapsed_time)
+    print(f"temps écoulé : {elapsed_time} secondes")
+    elapsed_time = round(elapsed_time / 60)
+    print(f"temps écoulé : {elapsed_time} min")
     return extractor.count_family()
 
 

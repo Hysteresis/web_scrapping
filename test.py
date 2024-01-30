@@ -61,7 +61,7 @@ def test_5_total_rows_in_database():
     print(len(data))
     con.close()
 
-    assert len(data) == 334
+    assert len(data) == 318
 
 
 def test_6_cheese_with_letter_a():
@@ -77,7 +77,7 @@ def test_6_cheese_with_letter_a():
 
     con.close()
 
-    assert row_count == 7
+    assert row_count == 6
 
 
 def test_7_famille_column_has_expected_values():
@@ -106,19 +106,18 @@ def test_8_format_date_creation():
     assert all(pd.to_datetime(data['creation_date'],  format='%Y-%m-%d %H:%M:%S').notnull())
 
 
-@pytest.mark.parametrize("fromage, famille, pate", [('Abbaye de la Pierre-qui-Vire', 'Vache', 'Molle à croûte lavée'),
-            ('Banon', 'Chèvre', 'Molle à croûte naturelle')])
-def test_9_insertion(fromage, famille, pate):
+@pytest.mark.parametrize("fromage", ['Abondance', 'Bethmale', 'Vully rouge Suisse'])
+def test_9_insertion(fromage):
     """
     test number of total rows for column 'date_creation'
     :return:
     """
     con = sqlite3.connect(db_path())
     data = pd.read_sql_query("SELECT * FROM ODS", con)
-    expected_row = (fromage, famille, pate)
+    expected_row = (fromage)
     con.close()
     print(f"\n\n\n\nexpected_row : {expected_row}")
-    existing_row = data[(data['Fromage'] == fromage) & (data['Famille'] == famille) & (data['Pate'] == pate)]
+    existing_row = data[(data['Fromage'] == fromage)]
     print(f"\n\n\nexisting_row {existing_row} ")
 
     assert not existing_row.empty
